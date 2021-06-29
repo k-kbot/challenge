@@ -97,3 +97,20 @@ SELECT * FROM employees ORDER BY birth_date;
 SET timestamp=1624938527;
 SELECT * FROM employees JOIN salaries ON employees.emp_no = salaries.emp_no;
 ```
+
+## 課題２（実装）
+
+- 最も頻度が高くスロークエリに現れるクエリ
+```shell
+mysqldumpslow -s c -t 1 [log_file ...]
+```
+
+- 実行時間が最も長いクエリ
+```shell
+mysqldumpslow -s t -t 1 [log_file ...]
+```
+
+- ロック時間が最も長いクエリ
+```shell
+mysqldumpslow -s l -t 1 [log_file ...]
+```
