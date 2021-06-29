@@ -65,6 +65,17 @@ JOIN   salaries
 ON     employees.emp_no = salaries.emp_no;
 ```
 
+### スロークエリログの保存先
+```sql
+mysql> show variables like 'slow_query_log_file';
++---------------------+--------------------------------------+
+| Variable_name       | Value                                |
++---------------------+--------------------------------------+
+| slow_query_log_file | /var/lib/mysql/7020b185d4b1-slow.log |
++---------------------+--------------------------------------+
+1 row in set (0.00 sec)
+```
+
 ### スロークエリログの内容
 ```shell
 root@7020b185d4b1:/# cat /var/lib/mysql/7020b185d4b1-slow.log
