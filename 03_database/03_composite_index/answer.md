@@ -100,8 +100,8 @@ mysql> EXPLAIN SELECT SQL_NO_CACHE *  FROM   employees.employees WHERE  last_nam
 ```
 
 ## 課題3（クイズ）
-- 
+1. 1990年に雇用された女性の従業員の全列を抽出してください。
 
-- 
+2. last_nameが`Furudate`の男性の従業員の人数を集計してください。
 
-- 
+3. first_nameが'Duro'で1958年生まれの女性の従業員の人数を集計してください。
