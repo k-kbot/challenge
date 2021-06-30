@@ -53,16 +53,15 @@ FROM   employees;
 ```
 
 ```sql
-SELECT *
+SELECT DISTINCT birth_date
 FROM   employees
 ORDER  BY birth_date;
 ```
 
 ```sql
-SELECT *
+SELECT gender, COUNT(*) AS number_of_people
 FROM   employees
-JOIN   salaries
-ON     employees.emp_no = salaries.emp_no;
+GROUP  BY gender;
 ```
 
 ### スロークエリログの保存先
@@ -78,24 +77,32 @@ mysql> show variables like 'slow_query_log_file';
 
 ### スロークエリログの内容
 ```shell
-root@7020b185d4b1:/# cat /var/lib/mysql/7020b185d4b1-slow.log
-
+root@ae9a7175c83d:/# cat /var/lib/mysql/ae9a7175c83d-slow.log
+mysqld, Version: 5.7.24 (MySQL Community Server (GPL)). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
 Time                 Id Command    Argument
-# Time: 2021-06-29T03:46:09.433035Z
+# Time: 2021-06-30T04:47:06.719290Z
 # User@Host: root[root] @ localhost []  Id:     3
-# Query_time: 0.139441  Lock_time: 0.000091 Rows_sent: 300024  Rows_examined: 300024
-SET timestamp=1624938369;
-SELECT * FROM employees;
-# Time: 2021-06-29T03:46:52.542420Z
+# Query_time: 0.234641  Lock_time: 0.000158 Rows_sent: 179973  Rows_examined: 300024
+use employees;
+SET timestamp=1625028426;
+SELECT *
+FROM   employees
+WHERE  gender = 'M';
+# Time: 2021-06-30T04:49:01.667925Z
 # User@Host: root[root] @ localhost []  Id:     3
-# Query_time: 0.220781  Lock_time: 0.000117 Rows_sent: 300024  Rows_examined: 600048
-SET timestamp=1624938412;
-SELECT * FROM employees ORDER BY birth_date;
-# Time: 2021-06-29T03:48:47.261628Z
+# Query_time: 0.116124  Lock_time: 0.002800 Rows_sent: 4750  Rows_examined: 309524
+SET timestamp=1625028541;
+SELECT DISTINCT birth_date
+FROM   employees
+ORDER  BY birth_date;
+# Time: 2021-06-30T04:49:09.415243Z
 # User@Host: root[root] @ localhost []  Id:     3
-# Query_time: 3.101893  Lock_time: 0.000154 Rows_sent: 2844047  Rows_examined: 5688094
-SET timestamp=1624938527;
-SELECT * FROM employees JOIN salaries ON employees.emp_no = salaries.emp_no;
+# Query_time: 0.101278  Lock_time: 0.000137 Rows_sent: 2  Rows_examined: 300028
+SET timestamp=1625028549;
+SELECT gender, COUNT(*) AS number_of_people
+FROM   employees
+GROUP  BY gender;
 ```
 
 ## 課題２（実装）
@@ -114,3 +121,71 @@ mysqldumpslow -s t -t 1 [log_file ...]
 ```shell
 mysqldumpslow -s l -t 1 [log_file ...]
 ```
+
+## 課題３（実装）
+### 最も頻度が高くスロークエリに現れるクエリ
+- クエリの取得
+```shell
+root@ae9a7175c83d:/# mysqldumpslow -s c -t 1 /var/lib/mysql/ae9a7175c83d-slow.log
+
+Reading mysql slow query log from /var/lib/mysql/ae9a7175c83d-slow.log
+Count: 1  Time=0.00s (0s)  Lock=0.00s (0s)  Rows=0.0 (0), 0users@0hosts
+  mysqld, Version: N.N.N (MySQL Community Server (GPL)). started with:
+  # Time: N-N-30T04:N:N.719290Z
+  # User@Host: root[root] @ localhost []  Id:     N
+  # Query_time: N.N  Lock_time: N.N Rows_sent: N  Rows_examined: N
+  use employees;
+  SET timestamp=N;
+  SELECT *
+  FROM   employees
+  WHERE  gender = 'S'
+
+```
+※なぜか`WHERE  gender = 'M'`が`WHERE  gender = 'S'`に化けている。
+
+- 高速化するインデックスの作成
+```sql
+CREATE INDEX idx_gender ON employees(gender);
+```
+
+### 実行時間が最も長いクエリ
+- クエリの取得
+```shell
+root@ae9a7175c83d:/# mysqldumpslow -s t -t 1 /var/lib/mysql/ae9a7175c83d-slow.log
+
+Reading mysql slow query log from /var/lib/mysql/ae9a7175c83d-slow.log
+Count: 1  Time=0.11s (0s)  Lock=0.00s (0s)  Rows=4750.0 (4750), root[root]@localhost
+  SELECT DISTINCT birth_date
+  FROM   employees
+  ORDER  BY birth_date
+
+```
+
+- 高速化するインデックスの作成
+```sql
+CREATE INDEX idx_birth_date ON employees(birth_date);
+```
+
+### インデックス作成後の実行速度計測
+- どちらも高速化されており、実行速度（下表の`Duration` 単位は`秒`）は0.1を下回っている。
+```sql
+mysql> SHOW PROFILES;
++----------+------------+-------------------------------------------------------------------------------+
+| Query_ID | Duration   | Query                                                                         |
++----------+------------+-------------------------------------------------------------------------------+
+|        1 | 0.04961000 | SELECT gender, COUNT(*) AS number_of_people FROM employees GROUP BY gender    |
+|        2 | 0.04858275 | SELECT DISTINCT birth_date FROM employees ORDER BY birth_date                 |
++----------+------------+-------------------------------------------------------------------------------+
+```
+
+## 課題４（質問）
+- LIMIT 1で1件しか取得しないクエリでも、時間がかかる場合がある理由
+```
+```
+
+- WHEREでの絞り込み・ONでの絞り込みの違い
+```
+```
+
+## 課題５
+- デフォルトの`long_query_time`は何秒か？
