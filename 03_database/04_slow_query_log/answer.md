@@ -179,13 +179,53 @@ mysql> SHOW PROFILES;
 ```
 
 ## 課題４（質問）
-- LIMIT 1で1件しか取得しないクエリでも、時間がかかる場合がある理由
+### LIMIT 1で1件しか取得しないクエリでも、時間がかかる場合がある理由
+
+MySQLではLIMIT句は最後に実行される。
+LIMIT句以外の処理が終わった後に、LIMIT句で指定した行数を返すに過ぎないため、処理時間はLIMIT句以外の部分に依存する。
 ```
+【参考】MySQLのクエリの実行順序
+1. FROM（JOIN含む）
+2. WHERE
+3. GROUP BY
+4. HAVING
+5. WINDOW関数
+6. SELECT
+7. DISTINCT
+8. UNION
+9. ORDER BY
+10. LIMIT と OFFSET
+```
+### WHEREでの絞り込み・ONでの絞り込みの違い
+実行速度（Duration 単位: 秒）を比較したところ、大差はなかった。
+出力結果は同じとなった。
+```
++------------+--------------------------------------------------------------------------------------------------------------------------------+
+| Duration   | Query                                                                                                                          |
++------------+--------------------------------------------------------------------------------------------------------------------------------+
+| 3.98456200 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no WHERE gender = "M" AND birth_date > "1960-01-01" |
+| 3.97244550 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no WHERE gender = "M" AND birth_date > "1960-01-01" |
+| 4.02828675 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no WHERE gender = "M" AND birth_date > "1960-01-01" |
+| 3.90722400 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no WHERE gender = "M" AND birth_date > "1960-01-01" |
+| 3.99262550 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no WHERE gender = "M" AND birth_date > "1960-01-01" |
++------------+--------------------------------------------------------------------------------------------------------------------------------+
+平均 3.97702875
+
++------------+--------------------------------------------------------------------------------------------------------------------------------+
+| Duration   | Query                                                                                                                          |
++------------+--------------------------------------------------------------------------------------------------------------------------------+
+| 3.99213125 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no AND gender = "M" AND birth_date > "1960-01-01"   |
+| 3.98561350 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no AND gender = "M" AND birth_date > "1960-01-01"   |
+| 4.39750875 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no AND gender = "M" AND birth_date > "1960-01-01"   |
+| 4.38617325 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no AND gender = "M" AND birth_date > "1960-01-01"   |
+| 3.99720850 | SELECT SQL_NO_CACHE * FROM employees e JOIN salaries s ON e.emp_no = s.emp_no AND gender = "M" AND birth_date > "1960-01-01"   |
++------------+--------------------------------------------------------------------------------------------------------------------------------+
+平均 4.15172705
 ```
 
-- WHEREでの絞り込み・ONでの絞り込みの違い
-```
-```
+上記のように内部結合では出力結果に違いはなかったが、外部結合では結果が異なる。
+ONでの絞り込みでは条件に該当しないレコードも出力されるが、WHEREでの絞り込みはテーブルを結合した結果に対してフィルタリングするため、条件に該当しないレコードは出力されない。
+
 
 ## 課題５
 - デフォルトの`long_query_time`は何秒か？
