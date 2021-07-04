@@ -8,3 +8,32 @@
 - 複数のタグのカラムに同じ値が格納される恐れがあるため、一意性が保証されない。
 - タグの種類が増えるたび、スキーマの変更が必要になる。
   - スキーマの変更に伴い、アプリケーションのSQL文を編集する必要がある。
+
+## 課題２
+### 解決策
+投稿とタグは多対多の関係にあるので、交差（中間）テーブルの`Post_tag_relations`を作成すると良い。
+### ER図
+
+```plantuml
+@startuml
+hide circle
+entity Posts {
+  * id: number
+  --
+  text: varchar
+}
+entity Tags {
+  * id: number
+  --
+  tag: varchar
+}
+entity Post_tag_relations {
+  * id: number
+  --
+  * post_id <<FK>>
+  * tag_id <<FK>>
+}
+Posts ||-ri-o{ Post_tag_relations
+Post_tag_relations }o-ri-|| Tags
+@enduml
+```
