@@ -69,6 +69,19 @@ WHERE t.descendant = 6;
 +----+
 ```
 
-Messageの削除では、
+葉ノード、例えばMessage`7`を削除するには、子孫としてMessage`7`を参照する全てのレコードを削除する。
+```sql
+DELETE FROM TreePaths
+WHERE descendant = 7;
+```
 
-ただし、階層が深くなると多くのレコードが別個のテーブルに必要となり、ストレージを圧迫するというデメリットがある。
+サブツリー全体、例えばMessage`4`とその子孫を全て削除するには、子孫としてMessage`4`を参照する全てのレコードと、Message`4`の子孫を子孫として参照する全てのレコードを削除する。
+```sql
+DELETE FROM TreePaths
+WHERE descendant IN (SELECT x.id FROM
+                       (SELECT descendant AS id
+                        FROM TreePaths
+                        WHERE ancestor = 4) AS x);
+```
+
+閉包テーブルは、階層が深くなると多くのレコードが別個のテーブルに必要となり、ストレージを圧迫するというデメリットがある。
