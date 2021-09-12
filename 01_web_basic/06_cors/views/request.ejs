@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>CORS</title>
+  </head>
+  <body>
+      <button onclick="simpleRequest()">Simple Request</button>
+      <button onclick="actualRequest()">Actual Request</button>
+
+      <script>
+        // ngrok http 8081 により発行されたドメイン
+        const URL = 'https://be650c54e8b6.ngrok.io';
+
+        const simpleRequest = () => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', URL);
+          xhr.send();
+        }
+
+        const actualRequest = () => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', URL);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send();
+        } 
+      </script>
+  </body>
+</html>
