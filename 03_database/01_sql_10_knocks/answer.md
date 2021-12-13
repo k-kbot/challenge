@@ -2,13 +2,11 @@
 
 ### 01_「常連顧客を特定して欲しい」
 ```sql
-SELECT C.CustomerID,
+SELECT CustomerID,
        Count(OrderID) AS OrderCount
-FROM   Customers AS C
-       JOIN Orders AS O
-         ON C.CustomerID = O.CustomerID
+FROM   Orders
 WHERE  OrderDate LIKE '1996%'
-GROUP  BY C.CustomerID
+GROUP  BY CustomerID
 HAVING OrderCount >= 3
 ORDER  BY OrderCount DESC
 ```
