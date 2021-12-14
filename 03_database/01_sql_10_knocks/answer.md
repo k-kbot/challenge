@@ -31,7 +31,7 @@ HAVING OrderDetailCount = (
 ### 03_「一番お世話になっている運送会社を教えて欲しい」
 ```sql
 SELECT ShipperID,
-       Count(OrderID) AS hippingCount
+       Count(OrderID) AS ShippingCount
 FROM   Orders
 GROUP  BY ShipperID
 ORDER  BY ShippingCount DESC
