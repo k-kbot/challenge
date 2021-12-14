@@ -14,11 +14,18 @@ ORDER  BY OrderCount DESC
 ### 02_「一度の注文で、最大どれぐらいの注文詳細が紐づく可能性があるのか」
 ```sql
 SELECT OrderID,
-       Count(OrderDetailID) AS OrderDetailCount
-FROM   OrderDetails
-GROUP  BY OrderID
-ORDER  BY OrderDetailCount DESC
-LIMIT  1
+    Count(OrderDetailID) AS OrderDetailCount
+FROM OrderDetails
+GROUP BY OrderID
+HAVING OrderDetailCount = (
+        SELECT MAX(OrderDetailCount)
+        FROM (
+                SELECT OrderID,
+                    COUNT(OrderID) AS OrderDetailCount
+                FROM OrderDetails
+                GROUP BY OrderID
+            )
+    )
 ```
 
 ### 03_「一番お世話になっている運送会社を教えて欲しい」
