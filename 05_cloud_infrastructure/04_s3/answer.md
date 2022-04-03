@@ -1,5 +1,19 @@
 ## 課題 1
 
+### ストレージクラス
+
+#### ストレージクラスの選び方
+
+オブジェクトのアクセス頻度や復元力、コスト要件に基づいて選択する。
+
+[Amazon S3 ストレージクラス](https://aws.amazon.com/jp/s3/storage-classes/)
+
+#### ほとんどアクセスされないバケットに適したストレージクラス
+
+Glacier ストレージクラスがコストが抑えられるため、適している。
+
+[Amazon S3 Glacier ストレージクラス](https://aws.amazon.com/jp/s3/storage-classes/glacier/)
+
 ### ライフサイクル
 
 #### ライフサイクルとは
