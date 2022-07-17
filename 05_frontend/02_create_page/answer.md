@@ -82,3 +82,8 @@ class Welcome extends React.Component {
 - constructor, render メソッドが必要
 
 [参考: Components and Props](https://reactjs.org/docs/components-and-props.html)
+
+## 課題 2
+
+以下 PR を参照
+https://github.com/k-kbot/challenge-frontend/pull/1
