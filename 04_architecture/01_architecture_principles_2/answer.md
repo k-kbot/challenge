@@ -89,6 +89,7 @@ class Rectangle {
 
 // 子クラス
 class Square extends Rectangle {
+  //正方形は幅と高さが同じになる
   setWidth(width: number) {
     super.setWidth(width);
     super.setHight(width);
@@ -111,10 +112,16 @@ rectangle2.setHight(4);
 console.log(rectangle2.getArea()); // => 16
 ```
 
+この例では、Square（正方形）クラスが Rectangle（長方形）クラスを継承している。
+Square is a Rectangle（正方形は長方形の一種）という点については問題がないが、Square クラスと Rectangle クラスでは setWidth, setHight の振る舞いが異なっており、開発者の不注意によってバグを生み出しやすくなってしまう。
+
 ## インターフェースを用いる事で、設計上どのようなメリットがあるか？
 
 - 同じインターフェースを実装する複数のクラスに、共通のメソッド群を実装するように強制できる
 - あるクラスがインターフェースを実装していれば、少なくともそのインターフェースが定めたメソッドを持っていることが保証される
+- 依存の方向を変える
+
+参考: [【C#】インターフェイスの利点が理解できない人は「インターフェイスには３つのタイプがある」ことを理解しよう](https://qiita.com/yutorisan/items/d28386f168f2f3ab166d)
 
 ## どんな時に依存性の逆転を用いる必要が生じるか？
 
