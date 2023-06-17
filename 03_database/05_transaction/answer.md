@@ -40,7 +40,14 @@
 
 ### 悲観ロック
 
+あるプロセスのデータを更新が終了するまで、他のプロセスは処理ができないロックのこと。
+悲観ロックがかかっている場合、他のプロセスは参照・更新ができずロックが外れるのを待つことになる。
+
 ### 楽観ロック
+
+あるプロセスがデータを更新している間であっても他のプロセスから参照は可能だが、更新は失敗するロックのこと。
+
+参考: [悲観もあれば楽観もある「トランザクション」の常識](https://atmarkit.itmedia.co.jp/ait/articles/1004/22/news102.html)
 
 ## 共有ロックと排他ロック
 
@@ -55,6 +62,8 @@
 - ロック対象へのすべてのアクセスを禁止する
 - SELECT, INSERT, UPDATE, DELETE すべて実行できない
 - 書き込みロック、X lock（eXcluded lock）と呼ばれることもある
+
+`SELECT FOR UPDATE`は排他ロックである。
 
 ## Fuzzy(Non-Repeatable) Read と Phantom Read
 
@@ -193,4 +202,36 @@ mysql> SELECT * FROM employees WHERE emp_no = 10000;
 |  10000 | 1950-01-01 | Taro       | Tanaka    | M      | 1990-01-01 |
 +--------+------------+------------+-----------+--------+------------+
 1 row in set (0.00 sec)
+```
+
+## 映画のチケット販売システム
+
+座席を予約するための端末が 10 台程度で多重予約が発生する恐れがほとんどないのであれば、悲観ロックではなく楽観ロックを利用するのが良いと考える。
+
+```typescript
+class ReservationUsecase {
+  constructor(private repository: SeatRepository) {}
+
+  async do(seatNumber: number, userId: number): boolean {
+    // 現在の予約状況を取得
+    const reservation = await this.repository.findById(seatNumber);
+
+    if (reservation.userId !== null) {
+      throw new Error("この座席は予約済みです。");
+    }
+
+    const newReservation = {
+      seatNumber,
+      userId,
+      version: reservation.version + 1,
+    };
+
+    try {
+      await this.repository.save(newReservation);
+      return true; // 予約成功
+    } catch {
+      return false; // 予約失敗
+    }
+  }
+}
 ```
