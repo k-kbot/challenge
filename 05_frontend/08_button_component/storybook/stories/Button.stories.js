@@ -1,39 +1,38 @@
 import { Button } from './Button';
 
-// More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 export default {
   title: 'Example/Button',
   component: Button,
   tags: ['autodocs'],
-  argTypes: {
-    backgroundColor: { control: 'color' },
+};
+
+export const Default = {}
+
+export const Apply = {
+  args: {
+    children: '応募する',
+    color: 'blue',
+    size: 'medium',
+    disabled: false,
+    onClick: () => alert('応募します'),
   },
 };
 
-// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
-export const Primary = {
+export const Delete = {
   args: {
-    primary: true,
-    label: 'Button',
-  },
-};
-
-export const Secondary = {
-  args: {
-    label: 'Button',
-  },
-};
-
-export const Large = {
-  args: {
-    size: 'large',
-    label: 'Button',
-  },
-};
-
-export const Small = {
-  args: {
+    children: '削除する',
+    color: 'red',
     size: 'small',
-    label: 'Button',
+    disabled: false,
+    onClick: () => alert('削除します'),
+  },
+};
+
+export const Disabled = {
+  args: {
+    children: '削除する',
+    color: 'red',
+    size: 'small',
+    disabled: true,
   },
 };
