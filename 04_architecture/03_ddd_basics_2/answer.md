@@ -117,3 +117,36 @@ Human2 {
 
 「いかなる場合でも基本データ型は悪」ということはない。
 むしろ、基本データ型の方がシンプルで済むこともある。
+
+## 課題 3
+
+「同一のメールアドレスを持つユーザは登録できない」という仕様を考える。
+以下のコードはアプリケーションではメールアドレスの重複チェックをせずに、RDB のユニーク制約でメールアドレスの重複を防いでいるとする。
+
+```typescript
+import { PrismaClient, User } from "@prisma/client";
+
+export class UserService {
+  private prisma: PrismaClient;
+
+  constructor() {
+    this.prisma = new PrismaClient();
+  }
+
+  async createUser(name: string, email: string): Promise<User> {
+    return this.prisma.user.create({
+      data: {
+        name,
+        email,
+      },
+    });
+  }
+}
+```
+
+このように、ドメインが持つべきルールがドメインに書かれていない状態を「ドメイン知識が漏れている」と言う。
+ただし、アプリケーションで明示的に重複の有無を確認しようとすると SELECT 文を発行する必要が生じるため、パフォーマンスの観点からそのオーバーヘッドを許容できない場合などは意図的にアプリケーションでの重複チェックをスキップすることもあり得る。
+
+## 課題 4
+
+軽量 DDD とはなんでしょうか？
